@@ -325,7 +325,7 @@ char* get_solving_array(int* a, int size_num, int* p, int* total_movs) {
 	}
 	*total_movs = *total_movs - 1;
 	moves = (char *)realloc(moves, move_index++);
-	*(moves + ++move_index) = '\0';
+	*(moves + move_index - 1) = '\0';
 	return moves;
 }
 

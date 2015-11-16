@@ -98,7 +98,7 @@ char*** parse_file_content(char str[], int* num_lines, int** num_words_per_line)
 	(*num_lines) = 0;
 	char** lines = split_a_string_by_pattern(str, "\n", num_lines);
 
-	//2. Create the variable 'content' to host the lines of the file a
+	//2. Create the variable 'content' to host the lines of the file
 	f_content = (char***)malloc((*num_lines) * sizeof(char**));
 	int* f_words_per_line = (int*)malloc((*num_lines) * sizeof(int*));
 
@@ -111,7 +111,6 @@ char*** parse_file_content(char str[], int* num_lines, int** num_words_per_line)
 	(*num_words_per_line) = &f_words_per_line[0];
 
 	return f_content;
-
 }
 
 //---------------------------------------------//

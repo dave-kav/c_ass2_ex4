@@ -68,10 +68,10 @@ struct palNode* find_previous_node(struct palNode* head, struct palNode* pointAt
 struct palNode* remove_a_palindrome(struct palNode* head, int num);
 
 //--------------------------------------------------
-// get_length_of_list 
+// find_size_of_list
 //--------------------------------------------------
 
-int get_length_of_list(struct palNode* head);
+int find_size_of_list(struct palNode* head);
 
 //--------------------------------------------------
 // sort_the_list 

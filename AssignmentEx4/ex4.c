@@ -59,7 +59,7 @@ int main(int argc, char* argv[]) {
 
 			//3. Check if palindrome is in the list
 		case 3:
-			printf("Enter the number for your new palindrome\n");
+			printf("Enter the number for your palindrome\n");
 			scanf("%s", &_num);
 			num = atoi(_num);
 
@@ -144,7 +144,7 @@ int main(int argc, char* argv[]) {
 			for (int i = 0; i < 100; i++)
 				printf("\n");
 
-			num = get_length_of_list(head);
+			num = find_size_of_list(head);
 			head = sort_the_list(head, num);
 
 			printf("Press key to continue\n");

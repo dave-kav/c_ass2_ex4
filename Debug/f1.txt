@@ -1,4 +1,6 @@
 1234	0	wawww
 1234567	1	dwwawwwwawwwwww
+00000	0	ddddd
 123456	2
+00000	0	ddddd
 12345	3	xxdxxxx
