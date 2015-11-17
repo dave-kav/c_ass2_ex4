@@ -1,4 +1,4 @@
-
+#pragma warning(disable:4996)
 #include "pal.h"
 
 //--------------------------------------------------
@@ -18,7 +18,7 @@ struct palNode {
 //--------------------------------------------------
 
 struct palNode* load_palNode_list_from_file(char file_name[]) {
-	int num_of_lines = 0;
+	int num_of_lines = 0, size = 0;
 	int* words_per_line = NULL;
 	char* str = read_entire_file_and_store_it_in_a_string(file_name);
 	char*** content = parse_file_content(str, &num_of_lines, &words_per_line);
@@ -32,7 +32,7 @@ for (int i = 0; i < num_of_lines; i++) {
 			head = ptr;
 			head->number = atoi(**content);
 			head->pointer_index = atoi(*(*content + 1));
-			if ((**(*content + 2)) != '\n')
+			if (*(*(*content + 2)) != '\n')
 			{
 				head->solving_array = (*(*content + 2));
 				head->solved = 1;
@@ -45,20 +45,34 @@ for (int i = 0; i < num_of_lines; i++) {
 			curr = head;
 		}
 		else {
-			int i = find_size_of_list(head);
-			ptr = ptr + i + 1;
+			ptr = ptr + 1;
 			ptr = (struct palNode *)malloc(sizeof(struct palNode));
 			ptr->number = atoi(**content);
 			ptr->pointer_index = atoi(*(*content + 1));
-			if ((*(*content + 2)) != '\n')
-			{
-				ptr->solving_array = (*(*content + 2));
-				ptr->solved = 1;
-			}
-			else {
+			//printf("%s", ((*(*content + 1) + 0)));
+			//printf("%s", ((*(*content + 1) + 8)));
+			//printf("%s", ((*(*content + 1) + 0)));
+			size = strlen(**content);
+			printf((**(content)+size));
+			if ((**(content) + size) == '\n') {
 				ptr->solved = 0;
 				ptr->solving_array = NULL;
 			}
+			//if (memchr((*(*content + 2)), 'a', 10) == NULL) {
+			//	if (memchr((*(*content + 2)), 'd', 10) == NULL) {
+			//		if (memchr((*(*content + 2)), 'w', 10) == NULL) {
+			//			if (memchr((*(*content + 2)), 'x', 10) == NULL) {
+			//				ptr->solved = 0;
+			//				ptr->solving_array = NULL;
+			//			}
+			//		}
+			//	}
+			//}
+			else {
+				ptr->solving_array = (*(*content + 2));
+				ptr->solved = 1;
+			}
+			
 			ptr->next = NULL;
 			curr->next = ptr;
 			curr = ptr;
@@ -216,7 +230,7 @@ struct palNode* remove_a_palindrome(struct palNode* head, int num) {
 		head = delete->next;
 	//end of list
 	int delete_index = 0;
-	for (int i = 0; i < find_size_of_list(head); i++) {
+	for (struct palNode* curr = head; curr->number != num; curr = curr->next) {
 		delete_index = delete_index + 1;
 	}
 	if (delete_index == find_size_of_list(head))
@@ -246,11 +260,45 @@ int find_size_of_list(struct palNode* head) {
 }
 
 //--------------------------------------------------
+// swap 
+//--------------------------------------------------
+
+void swap(struct palNode* a, struct palNode* b) {
+	struct palNode* temp = a;
+	a = b;
+	b = temp;
+}
+
+//--------------------------------------------------
 // sort_the_list 
 //--------------------------------------------------
 
 struct palNode* sort_the_list(struct palNode* head, int length) {
+	int swapped, i;
+	struct palNode *ptr1 = head;
+	struct palNode *ptr2 = NULL;
 
+	/* Checking for empty list */
+	if (ptr1 == NULL)
+		return;
+
+	do
+	{
+		swapped = 0;
+		ptr1 = head;
+
+		while (ptr1->next != ptr2)
+		{
+			if (strlen(ptr1->solving_array) > strlen(ptr1->next->solving_array))
+			{
+				swap(ptr1, ptr1->next);
+				swapped = 1;
+			}
+			ptr1 = ptr1->next;
+		}
+		ptr2 = ptr1;
+	} while (swapped);
+	printf("Operation completed\n");
 }
 
 //--------------------------------------------------
@@ -258,7 +306,21 @@ struct palNode* sort_the_list(struct palNode* head, int length) {
 //--------------------------------------------------
 
 void write_to_file(char str[], struct palNode* head) {
-
+	struct palNode* current = head;
+	FILE *f = fopen("file.txt", "w");
+	if (f == NULL)
+	{
+		printf("Error opening file!\n");
+		exit(1);
+	}
+	while (current != NULL) {
+		if (current->solved == 1)
+			fprintf(f, "%d\t%d\t%s\n", current->number, current->pointer_index, current->solving_array);
+		else
+			fprintf(f, "%d\t%d\n", current->number, current->pointer_index);
+		current = current->next;
+	}
+	printf("Operation Completed\n");
 }
 
 
