@@ -77,7 +77,7 @@ int find_size_of_list(struct palNode* head);
 // sort_the_list 
 //--------------------------------------------------
 
-struct palNode* sort_the_list(struct palNode* head, int length);
+struct palNode* sort_the_list(struct palNode* head);
 
 //--------------------------------------------------
 // write_to_file 

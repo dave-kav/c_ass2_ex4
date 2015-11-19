@@ -97,8 +97,13 @@ int main(int argc, char* argv[]) {
 			scanf("%s", &_num);
 			printf("Enter the index you want the pointer at start (-1 for generate it randomly)\n");
 			scanf("%s", &_pos);
+			int length = strlen(_num);
 			num = atoi(_num);
 			pos = atoi(_pos);
+
+			if (pos < 0) {
+				pos = gen_num(0, length);
+			}
 
 			for (int i = 0; i < 100; i++)
 				printf("\n");
@@ -144,8 +149,7 @@ int main(int argc, char* argv[]) {
 			for (int i = 0; i < 100; i++)
 				printf("\n");
 
-			num = find_size_of_list(head);
-			head = sort_the_list(head, num);
+			head = sort_the_list(head);
 
 			printf("Press key to continue\n");
 			c = my_get_char();

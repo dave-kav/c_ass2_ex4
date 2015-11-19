@@ -1,0 +1,4 @@
+123456	2
+1234	0	wawww
+12345	3	xxdxxxx
+1234567	1	dwwawwwwawwwwww

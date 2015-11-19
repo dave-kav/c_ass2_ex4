@@ -32,7 +32,7 @@ for (int i = 0; i < num_of_lines; i++) {
 			head = ptr;
 			head->number = atoi(**content);
 			head->pointer_index = atoi(*(*content + 1));
-			if (*(*(*content + 2)) != '\n')
+			if (*(words_per_line + i) == 3)
 			{
 				head->solving_array = (*(*content + 2));
 				head->solved = 1;
@@ -49,28 +49,13 @@ for (int i = 0; i < num_of_lines; i++) {
 			ptr = (struct palNode *)malloc(sizeof(struct palNode));
 			ptr->number = atoi(**content);
 			ptr->pointer_index = atoi(*(*content + 1));
-			//printf("%s", ((*(*content + 1) + 0)));
-			//printf("%s", ((*(*content + 1) + 8)));
-			//printf("%s", ((*(*content + 1) + 0)));
-			size = strlen(**content);
-			printf((**(content)+size));
-			if ((**(content) + size) == '\n') {
-				ptr->solved = 0;
-				ptr->solving_array = NULL;
-			}
-			//if (memchr((*(*content + 2)), 'a', 10) == NULL) {
-			//	if (memchr((*(*content + 2)), 'd', 10) == NULL) {
-			//		if (memchr((*(*content + 2)), 'w', 10) == NULL) {
-			//			if (memchr((*(*content + 2)), 'x', 10) == NULL) {
-			//				ptr->solved = 0;
-			//				ptr->solving_array = NULL;
-			//			}
-			//		}
-			//	}
-			//}
-			else {
+			if (*(words_per_line + i) == 3) {
 				ptr->solving_array = (*(*content + 2));
 				ptr->solved = 1;
+			}
+			else {
+				ptr->solved = 0;
+				ptr->solving_array = NULL;
 			}
 			
 			ptr->next = NULL;
@@ -184,7 +169,9 @@ char* solve_palindrome_of_node(struct palNode* current_node) {
 	int dummy1 = 0;
 	int* a = malloc(size*sizeof(int));
 	initialise_array(a, size, num);
-	return get_solving_array(a, size, (a + index_pointer), &dummy1);
+	char* solve = get_solving_array(a, size, (a + index_pointer), &dummy1);
+	free(a);
+	return solve;
 }
 
 //--------------------------------------------------
@@ -194,7 +181,11 @@ char* solve_palindrome_of_node(struct palNode* current_node) {
 struct palNode* solve_a_palindrome(struct palNode* head, int num) {
 	struct palNode* current = find_palindrome_in_list(head, num);
 	if (current == NULL) {
-		printf("Sorry, this number is not in the list");
+		printf("Sorry, this number is not in the list\n");
+		return NULL;
+	}
+	if (current->solved == 1) {
+		printf("This number is already solved\n");
 		return NULL;
 	}
 	current->solving_array = solve_palindrome_of_node(current);
@@ -208,12 +199,17 @@ struct palNode* solve_a_palindrome(struct palNode* head, int num) {
 //--------------------------------------------------
 
 struct palNode* find_previous_node(struct palNode* head, struct palNode* pointAtMe) {
-	struct palNode* current = head;
-	struct palNode* prev = head;
-	int index = 0;
-	while (current != pointAtMe) {
-		prev = current;
-		current = current->next;
+	if (head == pointAtMe) 
+		return NULL;
+	struct palNode* temp = head; // temp is current node
+	struct palNode* prev = NULL;
+
+	while (temp && temp != pointAtMe){ //seach while not reach to end or 
+		prev = temp;          // find previous node   
+		temp = temp->next;
+	}
+	if (temp != pointAtMe) {// node[a] not present in list
+		printf("\n error: node not found!\n");
 	}
 	return prev;
 }
@@ -224,10 +220,19 @@ struct palNode* find_previous_node(struct palNode* head, struct palNode* pointAt
 
 struct palNode* remove_a_palindrome(struct palNode* head, int num) {
 	struct palNode* delete = find_palindrome_in_list(head, num);
+	if (!delete) {
+		printf("Node not found in list\n");
+		return head;
+	}
 	struct palNode* prev = find_previous_node(head, delete);
 	//beginning of list
-	if (delete == head)
+	if (delete == head) {
 		head = delete->next;
+		free(delete->solving_array);
+		free(delete);
+		printf("Operation completed\n");
+		return head;
+	}
 	//end of list
 	int delete_index = 0;
 	for (struct palNode* curr = head; curr->number != num; curr = curr->next) {
@@ -263,20 +268,29 @@ int find_size_of_list(struct palNode* head) {
 // swap 
 //--------------------------------------------------
 
-void swap(struct palNode* a, struct palNode* b) {
-	struct palNode* temp = a;
+struct palNode* swap(struct palNode* head, struct palNode* a, struct palNode* b) {
+	struct palNode* temp = NULL;
+	struct palNode* prev = find_previous_node(head, a);
+	if(prev)
+		prev->next = b;
+	else 
+		head = b;
+	a->next = b->next;
+	temp = a;
+	b->next = temp;
 	a = b;
 	b = temp;
+	return head;
 }
 
 //--------------------------------------------------
 // sort_the_list 
 //--------------------------------------------------
 
-struct palNode* sort_the_list(struct palNode* head, int length) {
+struct palNode* sort_the_list(struct palNode* head) {
 	int swapped, i;
 	struct palNode *ptr1 = head;
-	struct palNode *ptr2 = NULL;
+	struct palNode *lptr = NULL;
 
 	/* Checking for empty list */
 	if (ptr1 == NULL)
@@ -286,19 +300,34 @@ struct palNode* sort_the_list(struct palNode* head, int length) {
 	{
 		swapped = 0;
 		ptr1 = head;
-
-		while (ptr1->next != ptr2)
+		while (ptr1)
 		{
-			if (strlen(ptr1->solving_array) > strlen(ptr1->next->solving_array))
-			{
-				swap(ptr1, ptr1->next);
-				swapped = 1;
+			if (ptr1->next) {
+				if (ptr1->solving_array && ptr1->next->solving_array) {
+					if (strlen(ptr1->solving_array) > strlen(ptr1->next->solving_array)) {
+						head = swap(head, ptr1, ptr1->next);
+						swapped = 1;
+					}
+				}
+				else if (!(ptr1->solving_array) && ptr1->next->solving_array) {
+					if (0 > strlen(ptr1->next->solving_array)) {
+						head = swap(head, ptr1, ptr1->next);
+						swapped = 1;
+					}
+				}
+				else if ((ptr1->solving_array) && !(ptr1->next->solving_array)) {
+					if (strlen(ptr1->solving_array) > 0) {
+						head = swap(head, ptr1, ptr1->next);
+						swapped = 1;
+					}
+				}
 			}
 			ptr1 = ptr1->next;
 		}
-		ptr2 = ptr1;
+		lptr = ptr1;
 	} while (swapped);
 	printf("Operation completed\n");
+	return head;
 }
 
 //--------------------------------------------------
@@ -307,13 +336,12 @@ struct palNode* sort_the_list(struct palNode* head, int length) {
 
 void write_to_file(char str[], struct palNode* head) {
 	struct palNode* current = head;
-	FILE *f = fopen("file.txt", "w");
+	FILE *f = fopen(str, "w");
 	if (f == NULL)
 	{
 		printf("Error opening file!\n");
-		exit(1);
 	}
-	while (current != NULL) {
+	 while (current != NULL) {
 		if (current->solved == 1)
 			fprintf(f, "%d\t%d\t%s\n", current->number, current->pointer_index, current->solving_array);
 		else
@@ -321,6 +349,7 @@ void write_to_file(char str[], struct palNode* head) {
 		current = current->next;
 	}
 	printf("Operation Completed\n");
+	fclose(f);
 }
 
 
